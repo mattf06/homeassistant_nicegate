@@ -116,6 +116,7 @@ class NiceGateApi:
         try:
             while True:
                 msg = await self.__recvall()
+                print(msg)
                 if msg == "":
                     break
                 await self.__process_event(msg)
@@ -220,7 +221,8 @@ class NiceGateApi:
         try:
             ctx = ssl.SSLContext(ssl.PROTOCOL_TLS)
             ctx.check_hostname = False
-            ctx.options |= 0x4  # ssl.OP_LEGACY_SERVER_CONNECT
+            ctx.options |= 0x4
+            ctx.set_ciphers('DEFAULT:@SECLEVEL=0')
 
             await asyncio.sleep(0.01)
             reader, writer = await asyncio.open_connection(self.host, 443, ssl=ctx)
@@ -252,6 +254,9 @@ class NiceGateApi:
 
         return self.pwd
 
+    def setPassword(self, pwd):
+        self.pwd = pwd
+
     async def verify_connect(self)->str:
         status="error"
         writer=None
@@ -260,7 +265,8 @@ class NiceGateApi:
         try:
             ctx = ssl.SSLContext(ssl.PROTOCOL_TLS)
             ctx.check_hostname = False
-            ctx.options |= 0x4  # ssl.OP_LEGACY_SERVER_CONNECT
+            ctx.options |= 0x4
+            ctx.set_ciphers('DEFAULT:@SECLEVEL=0')
 
             await asyncio.sleep(0.01)
             reader, writer = await asyncio.open_connection(self.host, 443, ssl=ctx)
@@ -306,8 +312,9 @@ class NiceGateApi:
         try:
             ctx = ssl.SSLContext(ssl.PROTOCOL_TLS)
             ctx.check_hostname = False
-            ctx.options |= 0x4  # ssl.OP_LEGACY_SERVER_CONNECT
-            
+            ctx.options |= 0x4 | ssl.OP_SINGLE_DH_USE
+            ctx.set_ciphers('DEFAULT:@SECLEVEL=0')
+
             if self.serv_writer is not None or self.serv_reader is not None:
                 await self.disconnect()
             if self._loop_task is not None:
