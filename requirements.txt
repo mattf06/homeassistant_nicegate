@@ -1,0 +1,5 @@
+requests~=2.32.3
+async-timeout~=5.0.1
+homeassistant~=2025.2.5
+defusedxml~=0.7.1
+voluptuous~=0.15.2
